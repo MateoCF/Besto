@@ -1,0 +1,41 @@
+<% include ./partials/header %>
+
+    <h1>Are you a true friend of <%= username %>?</h1>
+    <p><%= error %></p>
+
+    <form action="/<%= username %>" method="post" id="quizmakerform">
+      
+      <label for="color"><%= username %>'s favorite color</label>
+      <input type="text" name="color"/><br>
+      
+      <label for="currentage"><%= username %>'s current age</label>
+      <input type="number" name="currentage"/><br>
+      
+      <label for="crush"><%= username %>'s current crush (First Name)</label>
+      <input type="text" name="crush"/><br>
+      
+      <label for="movie"><%= username %>'s favorite movie</label>
+      <input type="text" name="movie"/><br>
+      
+      <label for="pet">How many total pets has <%= username %>'s owned?</label>
+      <input type="number" name="pet"/><br>
+      
+      <label for="snack">What is <%= username %>'s favorite snack?</label>
+      <input type="text" name="snack"/><br>
+
+      <label for="enemy">Who is <%= username %>'s enemy (First Name)</label>
+      <input type="text" name="enemy"/><br>
+      
+      <label for="song">What is <%= username %>'s favorite song? (Don't include author)</label>
+      <input type="text" name="favsong"/><br>
+      
+      <label for="song">What song would make <%= username %>'s cry? (Don't include author)</label>
+      <input type="text" name="sadsong"/><br>
+      
+      <textarea name="message" form="quizmakerform">Enter message here to send to <%= username %></textarea><br>
+      
+      <input type="submit" name="Check your score!"/>
+    </form>
+    
+<% include ./partials/footer %>
+
