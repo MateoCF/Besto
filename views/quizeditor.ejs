@@ -1,38 +1,79 @@
 <% include ./partials/header %>
+  <div class="inverse-masonry-margin masonry-layout-content">
     <h1>Edit this quiz for others to solve!</h1>
     <p><%= error %></p>
-    <form action="/quizmaker/<%= username %>" method="post" id="quizmakerform">
+  </div>
+  
+    <form action="/quizeditor/<%= username %>" method="post" id="quizmakerform">
+      <div class="masonry-layout">
       
-      <label for="color">Your favorite color</label>
-      <input type="text" name="color" value="<%= color %>"/><br>
-      
-      <label for="currentage">Your current age</label>
-      <input type="number" name="currentage"/><br>
-      
-      <label for="crush">Your current crush (First Name)</label>
-      <input type="text" name="crush"/><br>
-      
-      <label for="movie">Your favorite movie</label>
-      <input type="text" name="movie"/><br>
-      
-      <label for="pet">How many total pets have you owned?</label>
-      <input type="number" name="pet"/><br>
-      
-      <label for="snack">What is your favorite snack?</label>
-      <input type="text" name="snack"/><br>
+        <div class="masonry-layout-panel">
+          <div class="masonry-layout-content">
+            <label for="color">Your favorite color</label>
+            <input type="text" name="color" value="<%= color %>" />
+          </div>
+        </div>
 
-      <label for="enemy">Who is your enemy (First Name)</label>
-      <input type="text" name="enemy"/><br>
-      
-      <label for="song">What is your favorite song? (Don't include artist)</label>
-      <input type="text" name="favsong"/><br>
-      
-      <label for="song">What song would make you cry? (Don't include artist)</label>
-      <input type="text" name="sadsong"/><br>
-      
-      <textarea name="message" form="quizmakerform">Enter message here to send to your quiz-takers!</textarea><br>
-      
-      <input type="submit" name="Make quiz for others to take!"/>
+        <div class="masonry-layout-panel">
+          <div class="masonry-layout-content">
+            <label for="song">What song would make you cry? (Don't include artist)</label>
+            <input type="text" name="sadsong" value="<%= sadsong %>" />
+          </div>
+        </div>
+    
+        <div class="masonry-layout-panel">
+          <div class="masonry-layout-content">
+            <label for="crush">Your current crush (First Name)</label>
+            <input type="text" name="crush" value="<%= crush %>" />
+          </div>
+        </div>
+  
+        <div class="masonry-layout-panel">
+          <div class="masonry-layout-content">
+            <label for="movie">Your favorite movie</label>
+            <input type="text" name="movie" value="<%= movie %>" />
+          </div>
+        </div>
+    
+        <div class="masonry-layout-panel">
+          <div class="masonry-layout-content">
+            <label for="pet">How many total pets have you owned?</label>
+            <input type="number" name="pet" value="<%= pet %>" />
+          </div>
+        </div>
+    
+        <div class="masonry-layout-panel">
+          <div class="masonry-layout-content">
+            <label for="song">What is your favorite song? (Don't include artist)</label>
+            <input type="text" name="favsong" value="<%= favsong %>" />
+          </div>
+        </div>
+  
+        <div class="masonry-layout-panel">
+          <div class="masonry-layout-content">
+            <label for="enemy">Who is your enemy (First Name)</label>
+            <input type="text" name="enemy" value="<%= enemy %>" />
+          </div>
+        </div>
+    
+        <div class="masonry-layout-panel">
+          <div class="masonry-layout-content">
+            <label for="snack">What is your favorite snack?</label>
+            <input type="text" name="snack" value="<%= snack %>" />
+          </div>
+        </div>
+        
+        <div class="masonry-layout-panel">
+          <div class="masonry-layout-content">
+            <label for="currentage">Your current age</label>
+            <input type="number" name="currentage" value="<%= currentage %>" />
+          </div>
+        </div>
+        
+      </div>
+      <div class="inverse-masonry-margin masonry-layout-content">
+        <textarea name="message" form="quizmakerform"><%= message %></textarea>
+        <input type="submit" name="Make quiz for others to take!"/>
+      </div>
     </form>
-<% include ./partials/footer %>
-
+  <% include ./partials/footer %>

@@ -32,7 +32,7 @@ router.get('/quizmaker/:username', function(req, res, next){
 });
 
 function isEmpty(variable) {
-    if (variable == "" || null || undefined) {
+    if (variable === "" || null || undefined) {
         return true;
     }
     else {
@@ -92,17 +92,24 @@ router.post('/quizmaker/:username', function(req, res, next){
 router.get('/entries/:username', function(req, res, next) {
     var paramUsername = xssFilters.inHTMLData(req.params.username);
     Quiz.find({ "username": paramUsername, "isKey": false }, function(err, entries){
-        if (err) {
-            res.send('Illegal Request', 400);
-        }
-        else {
-            Quiz.find({"username": paramUsername, "isKey": true}, function(err, setting){
-                res.render('quizentries', {
-                    "username": paramUsername,
-                    "entries": entries,
-                    "currentSetting": setting 
+        if(entries.length != 0) {
+            if (err) {
+                res.send('Illegal Request', 400);
+            }
+            else {
+                Quiz.find({"username": paramUsername, "isKey": true}, function(err, setting){
+                    if (err) {
+                        res.send('Illegal request. (Reported)', 400);
+                    }
+                    res.render('quizentries', {
+                        "username": paramUsername,
+                        "entries": entries,
+                        "currentSetting": setting 
+                    });
                 });
-            });
+            }
+        } else {
+            res.redirect('/quizmaker/' + paramUsername);
         }
     });
 });
@@ -116,8 +123,9 @@ router.get('/:username', function(req, res, next) {
 //Here is when a user makes a mistake filling out the form
 router.get('/:username/error', function(req, res, next) {
    var paramUsername = xssFilters.inHTMLData(req.params.username);
-   res.render('quiztotake', { "username": paramUsername, "error": 'Hey! You might want to fill out all the forms!'}); 
+   res.render('quiztotake', { "username": paramUsername, "error": 'Hey! You might want to fill out all inputs!'}); 
 });
+
 
 router.post('/:username/results', function(req, res, next) {
    var paramUsername = xssFilters.inHTMLData(req.params.username);
@@ -153,10 +161,14 @@ router.post('/:username/results', function(req, res, next) {
                 res.send('Illegal request. (Reported)', 400);
             }
             else {
-                var answerKey = Quiz.find({ "username": paramUsername, "isKey": true });
-                res.render('results', { 
-                    "username": paramUsername, 
-                    "results": comparingResults(answerKey, quizAnswer)
+                Quiz.findOne({ "username": paramUsername, "isKey": true }, function(err, foundKey){
+                    if (err) {
+                        res.send('Illegal request. (Reported)', 400);
+                    }
+                    res.render('results', { 
+                        "username": paramUsername, 
+                        "results": comparingResults(foundKey, quizAnswer)
+                    });
                 });
             }
         });
@@ -165,11 +177,16 @@ router.post('/:username/results', function(req, res, next) {
 
 function comparingResults(answerKey, newAttempt) {
     var score = 100;
-    for (var i in answerKey) {
-        if (answerKey[i] != newAttempt[i]) {
-            score -= 11;
-        }
-    }
+    if (newAttempt.color != answerKey.color) { score -= 11 }
+    if (newAttempt.currentage != answerKey.currentage) { score -= 11 }
+    if (newAttempt.crush != answerKey.crush) { score -= 11 }
+    if (newAttempt.movie != answerKey.movie) { score -= 11 }
+    if (newAttempt.pet != answerKey.pet) { score -= 11 }
+    if (newAttempt.snack != answerKey.snack) { score -= 11 }
+    if (newAttempt.enemy != answerKey.enemy) { score -= 11 }
+    if (newAttempt.favsong != answerKey.favsong) { score -= 11 }
+    if (newAttempt.sadsong != answerKey.sadsong) { score -= 11 }
+    console.log(newAttempt.sadsong + answerKey.sadsong);
     return score;
 }
 
@@ -182,22 +199,23 @@ router.get('/quizeditor/:username', function(req, res, next) {
         }
         console.log(numOfKeys);
         if (numOfKeys != 0) {
-            Quiz.find({ "username": paramUsername, "isKey": true}, function(err, quiz){
+            Quiz.find({ "username": paramUsername, "isKey": true}, function(err, foundquiz){
                 if(err) { 
                     res.send('Illegal Request', 400);
                 }
+                console.log(foundquiz);
                 res.render('quizeditor', { 
-                    username: paramUsername, 
-                    color: quiz.color,
-                    currentage: quiz.currentage,
-                    crush: quiz.crush,
-                    movie: quiz.movie,
-                    pet: quiz.pet,
-                    snack: quiz.snack,
-                    enemy: quiz.enemy,
-                    favsong: quiz.favsong,
-                    sadsong: quiz.sadsong,
-                    message: quiz.message,
+                    "username": paramUsername, 
+                    color: foundquiz[0].color,
+                    currentage: foundquiz[0].currentage,
+                    crush: foundquiz[0].crush,
+                    movie: foundquiz[0].movie,
+                    pet: foundquiz[0].pet,
+                    snack: foundquiz[0].snack,
+                    enemy: foundquiz[0].enemy,
+                    favsong: foundquiz[0].favsong,
+                    sadsong: foundquiz[0].sadsong,
+                    message: foundquiz[0].message,
                     error: '' 
                 })
             });
@@ -208,5 +226,74 @@ router.get('/quizeditor/:username', function(req, res, next) {
 });
 
 //Error checking and editing stuff
-
+router.post('/quizeditor/:username', function(req, res, next) {
+   var paramUsername = xssFilters.inHTMLData(req.params.username);
+    var pendingQuizEdit =
+        new Quiz({
+            username: paramUsername,
+            color: xssFilters.inHTMLData(req.body.color),
+            currentage: xssFilters.inHTMLData(req.body.currentage),
+            crush: xssFilters.inHTMLData(req.body.crush),
+            movie: xssFilters.inHTMLData(req.body.movie),
+            pet: xssFilters.inHTMLData(req.body.pet),
+            snack: xssFilters.inHTMLData(req.body.snack),
+            enemy: xssFilters.inHTMLData(req.body.enemy),
+            favsong: xssFilters.inHTMLData(req.body.favsong),
+            sadsong: xssFilters.inHTMLData(req.body.sadsong),
+            message: xssFilters.inHTMLData(req.body.message),
+            isKey: true
+        });
+    if (isEmpty(pendingQuizEdit.username) ||
+        isEmpty(pendingQuizEdit.color) ||
+        isEmpty(pendingQuizEdit.currentage) ||
+        isEmpty(pendingQuizEdit.crush) ||
+        isEmpty(pendingQuizEdit.movie) ||
+        isEmpty(pendingQuizEdit.pet) ||
+        isEmpty(pendingQuizEdit.snack) ||
+        isEmpty(pendingQuizEdit.enemy) ||
+        isEmpty(pendingQuizEdit.favsong) ||
+        isEmpty(pendingQuizEdit.sadgong)) {
+        Quiz.find({ "username": paramUsername, "isKey": true}, function(err, quiz){
+            if(err) { 
+                res.send('Illegal Request', 400);
+            } else {
+                res.render('quizeditor', 
+                    res.render('quizeditor', { 
+                        username: paramUsername, 
+                        color: quiz.color,
+                        currentage: quiz.currentage,
+                        crush: quiz.crush,
+                        movie: quiz.movie,
+                        pet: quiz.pet,
+                        snack: quiz.snack,
+                        enemy: quiz.enemy,
+                        favsong: quiz.favsong,
+                        sadsong: quiz.sadsong,
+                        message: quiz.message,
+                        error: 'Hey! You might want to fill out all inputs!' 
+                    })
+                );
+            }
+        });
+    } else {
+        Quiz.findOneAndUpdate({ "username": paramUsername, "isKey": true}, {
+            color: xssFilters.inHTMLData(req.body.color),
+            currentage: xssFilters.inHTMLData(req.body.currentage),
+            crush: xssFilters.inHTMLData(req.body.crush),
+            movie: xssFilters.inHTMLData(req.body.movie),
+            pet: xssFilters.inHTMLData(req.body.pet),
+            snack: xssFilters.inHTMLData(req.body.snack),
+            enemy: xssFilters.inHTMLData(req.body.enemy),
+            favsong: xssFilters.inHTMLData(req.body.favsong),
+            sadsong: xssFilters.inHTMLData(req.body.sadsong),
+            message: xssFilters.inHTMLData(req.body.message)
+        }, function(err, update){
+            if (err) {
+                res.send('Illegal Request. Reported.', 400);
+            } else {
+                res.redirect('/entries/' + paramUsername);
+            }
+        });
+    }
+});
 module.exports = router;

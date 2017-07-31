@@ -5,11 +5,11 @@ Current Quiz Setting:
 <br>
 Share this link for everyone to take your quiz! <a href="http://besto-mrmjcf.c9users.io/<%= username %>">heyyy</a>
 <hr>
-<% if (entries) { %>
+<% if (entries == "[]") { %>
     No one has filled out your quiz...yet ;)
 <% } else { %>
     <% for (var i = 0; i < entries.length; i++) { %>
-        P'salm body said that this is the amount of pets u havbe: <%= entries[i].pet %>
+        P'salm body said that this is the amount of pets u havbe: <%= entries[i].pet %><br>
     <% } %>
 <% } %>
 <% include ./partials/footer %>
