@@ -5,66 +5,34 @@
   </div>
   
     <form action="/quizeditor/<%= username %>" method="post" id="quizmakerform">
-      <div class="masonry-layout">
+      <div class="masonry-layout quizmaker">
       
         <div class="masonry-layout-panel">
           <div class="masonry-layout-content">
             <label for="color">Your favorite color</label>
             <input type="text" name="color" value="<%= color %>" />
-          </div>
-        </div>
 
-        <div class="masonry-layout-panel">
-          <div class="masonry-layout-content">
-            <label for="song">What song would make you cry? (Don't include artist)</label>
+            <label for="song">What song would make you cry?</label>
             <input type="text" name="sadsong" value="<%= sadsong %>" />
-          </div>
-        </div>
-    
-        <div class="masonry-layout-panel">
-          <div class="masonry-layout-content">
-            <label for="crush">Your current crush (First Name)</label>
+
+            <label for="crush">Who is your current crush?</label>
             <input type="text" name="crush" value="<%= crush %>" />
-          </div>
-        </div>
-  
-        <div class="masonry-layout-panel">
-          <div class="masonry-layout-content">
+
             <label for="movie">Your favorite movie</label>
             <input type="text" name="movie" value="<%= movie %>" />
-          </div>
-        </div>
-    
-        <div class="masonry-layout-panel">
-          <div class="masonry-layout-content">
+
             <label for="pet">How many total pets have you owned?</label>
             <input type="number" name="pet" value="<%= pet %>" />
-          </div>
-        </div>
-    
-        <div class="masonry-layout-panel">
-          <div class="masonry-layout-content">
-            <label for="song">What is your favorite song? (Don't include artist)</label>
+
+            <label for="song">What is your favorite song?</label>
             <input type="text" name="favsong" value="<%= favsong %>" />
-          </div>
-        </div>
-  
-        <div class="masonry-layout-panel">
-          <div class="masonry-layout-content">
-            <label for="enemy">Who is your enemy (First Name)</label>
+
+            <label for="enemy">Who is your enemy?</label>
             <input type="text" name="enemy" value="<%= enemy %>" />
-          </div>
-        </div>
-    
-        <div class="masonry-layout-panel">
-          <div class="masonry-layout-content">
+
             <label for="snack">What is your favorite snack?</label>
             <input type="text" name="snack" value="<%= snack %>" />
-          </div>
-        </div>
-        
-        <div class="masonry-layout-panel">
-          <div class="masonry-layout-content">
+
             <label for="currentage">Your current age</label>
             <input type="number" name="currentage" value="<%= currentage %>" />
           </div>

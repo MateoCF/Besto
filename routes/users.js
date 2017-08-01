@@ -5,13 +5,22 @@ var xssFilters = require('xss-filters');
 
 // xssFilters.inHTMLData(firstname)
 
+router.get('/a/about', function(req, res, next) {
+    res.render('about');
+})
+
+router.get('/quizmaker', function(req, res, next) {
+    res.redirect('/');
+})
+
 //Show page to give username
 router.get('/', function(req, res, next) {
-  res.render('signup');
+    res.render('signup');
 });
 
 //Redirect username to...
 router.post('/quizmaker', function(req, res, next) {
+    var hour = 3600000;
     res.redirect('/quizmaker/' + req.body.username);
 });
 
@@ -22,7 +31,6 @@ router.get('/quizmaker/:username', function(req, res, next){
         if(err) { 
             res.send('Illegal Request', 400);
         }
-        console.log(numOfKeys);
         if (numOfKeys == 0) {
             res.render('quizmaker', { username: paramUsername, error: '' });
         } else {
@@ -38,6 +46,20 @@ function isEmpty(variable) {
     else {
         return false;
     }
+}
+
+function comparingResults(answerKey, newAttempt) {
+    var score = 100;
+    if (newAttempt.color != answerKey.color) { score -= 11 }
+    if (newAttempt.currentage != answerKey.currentage) { score -= 11 }
+    if (newAttempt.crush != answerKey.crush) { score -= 11 }
+    if (newAttempt.movie != answerKey.movie) { score -= 11 }
+    if (newAttempt.pet != answerKey.pet) { score -= 11 }
+    if (newAttempt.snack != answerKey.snack) { score -= 11 }
+    if (newAttempt.enemy != answerKey.enemy) { score -= 11 }
+    if (newAttempt.favsong != answerKey.favsong) { score -= 11 }
+    if (newAttempt.sadsong != answerKey.sadsong) { score -= 11 }
+    return score;
 }
 
 //...check to see errors (and might redirect) but eventually...
@@ -91,23 +113,36 @@ router.post('/quizmaker/:username', function(req, res, next){
 //...let them go to their 'dashboard' and see other people's entries.
 router.get('/entries/:username', function(req, res, next) {
     var paramUsername = xssFilters.inHTMLData(req.params.username);
-    Quiz.find({ "username": paramUsername, "isKey": false }, function(err, entries){
-        if(entries.length != 0) {
-            if (err) {
-                res.send('Illegal Request', 400);
-            }
-            else {
-                Quiz.find({"username": paramUsername, "isKey": true}, function(err, setting){
-                    if (err) {
-                        res.send('Illegal request. (Reported)', 400);
+    Quiz.find({ "username": paramUsername, "isKey": true }, function(err, setting){
+        if (err) {
+            res.send('Illegal Request. Reported', 400);
+        }
+        if(setting.length == 1) {
+            Quiz.find({"username": paramUsername, "isKey": false}, function(err, entries){
+                if (err) {
+                    res.send('Illegal request. Reported.', 400);
+                    console.log(err);
+                }
+                if(entries.length > 1) {
+                    var scores = []; 
+                    for(var i = 0;i < entries.length; i++) {
+                        scores.push(comparingResults(setting[0], entries[i]));
                     }
                     res.render('quizentries', {
                         "username": paramUsername,
                         "entries": entries,
-                        "currentSetting": setting 
+                        "currentSetting": setting,
+                        "scores": scores,
                     });
-                });
-            }
+                } else {
+                    res.render('quizentries', {
+                        "username": paramUsername,
+                        "entries": "[]",
+                        "currentSetting": setting,
+                        "scores": []
+                    });
+                }
+            });
         } else {
             res.redirect('/quizmaker/' + paramUsername);
         }
@@ -158,37 +193,26 @@ router.post('/:username/results', function(req, res, next) {
     } else {
         pendingQuizAnswer.save(function(err, quizAnswer) {
             if (err) {
-                res.send('Illegal request. (Reported)', 400);
+                res.send('Illegal request. Reported.', 400);
             }
             else {
                 Quiz.findOne({ "username": paramUsername, "isKey": true }, function(err, foundKey){
                     if (err) {
-                        res.send('Illegal request. (Reported)', 400);
+                        res.send('Illegal request. Reported.', 400);
                     }
-                    res.render('results', { 
-                        "username": paramUsername, 
-                        "results": comparingResults(foundKey, quizAnswer)
-                    });
+                    if (foundKey == null) {
+                        res.render('simpleerror', { "error": "No user exists under that name", "desc": ''})
+                    } else {
+                        res.render('results', { 
+                            "username": paramUsername, 
+                            "results": comparingResults(foundKey, quizAnswer)
+                        });
+                    }
                 });
             }
         });
     }
 });
-
-function comparingResults(answerKey, newAttempt) {
-    var score = 100;
-    if (newAttempt.color != answerKey.color) { score -= 11 }
-    if (newAttempt.currentage != answerKey.currentage) { score -= 11 }
-    if (newAttempt.crush != answerKey.crush) { score -= 11 }
-    if (newAttempt.movie != answerKey.movie) { score -= 11 }
-    if (newAttempt.pet != answerKey.pet) { score -= 11 }
-    if (newAttempt.snack != answerKey.snack) { score -= 11 }
-    if (newAttempt.enemy != answerKey.enemy) { score -= 11 }
-    if (newAttempt.favsong != answerKey.favsong) { score -= 11 }
-    if (newAttempt.sadsong != answerKey.sadsong) { score -= 11 }
-    console.log(newAttempt.sadsong + answerKey.sadsong);
-    return score;
-}
 
 //Send form to edit
 router.get('/quizeditor/:username', function(req, res, next) {
@@ -197,13 +221,11 @@ router.get('/quizeditor/:username', function(req, res, next) {
         if(err) { 
             res.send('Illegal Request', 400);
         }
-        console.log(numOfKeys);
         if (numOfKeys != 0) {
             Quiz.find({ "username": paramUsername, "isKey": true}, function(err, foundquiz){
                 if(err) { 
                     res.send('Illegal Request', 400);
                 }
-                console.log(foundquiz);
                 res.render('quizeditor', { 
                     "username": paramUsername, 
                     color: foundquiz[0].color,
@@ -228,8 +250,7 @@ router.get('/quizeditor/:username', function(req, res, next) {
 //Error checking and editing stuff
 router.post('/quizeditor/:username', function(req, res, next) {
    var paramUsername = xssFilters.inHTMLData(req.params.username);
-    var pendingQuizEdit =
-        new Quiz({
+    var pendingQuizEdit = {
             username: paramUsername,
             color: xssFilters.inHTMLData(req.body.color),
             currentage: xssFilters.inHTMLData(req.body.currentage),
@@ -242,7 +263,7 @@ router.post('/quizeditor/:username', function(req, res, next) {
             sadsong: xssFilters.inHTMLData(req.body.sadsong),
             message: xssFilters.inHTMLData(req.body.message),
             isKey: true
-        });
+        };
     if (isEmpty(pendingQuizEdit.username) ||
         isEmpty(pendingQuizEdit.color) ||
         isEmpty(pendingQuizEdit.currentage) ||
@@ -257,22 +278,20 @@ router.post('/quizeditor/:username', function(req, res, next) {
             if(err) { 
                 res.send('Illegal Request', 400);
             } else {
-                res.render('quizeditor', 
-                    res.render('quizeditor', { 
-                        username: paramUsername, 
-                        color: quiz.color,
-                        currentage: quiz.currentage,
-                        crush: quiz.crush,
-                        movie: quiz.movie,
-                        pet: quiz.pet,
-                        snack: quiz.snack,
-                        enemy: quiz.enemy,
-                        favsong: quiz.favsong,
-                        sadsong: quiz.sadsong,
-                        message: quiz.message,
-                        error: 'Hey! You might want to fill out all inputs!' 
-                    })
-                );
+                res.render('quizeditor', { 
+                    username: paramUsername, 
+                    color: quiz[0].color,
+                    currentage: quiz[0].currentage,
+                    crush: quiz[0].crush,
+                    movie: quiz[0].movie,
+                    pet: quiz[0].pet,
+                    snack: quiz[0].snack,
+                    enemy: quiz[0].enemy,
+                    favsong: quiz[0].favsong,
+                    sadsong: quiz[0].sadsong,
+                    message: quiz[0].message,
+                    error: 'Hey! You might want to fill out all inputs!' 
+                })
             }
         });
     } else {
@@ -296,4 +315,5 @@ router.post('/quizeditor/:username', function(req, res, next) {
         });
     }
 });
+
 module.exports = router;

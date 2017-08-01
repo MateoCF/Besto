@@ -6,7 +6,7 @@
       <%= error %>
     </p>
   </div>
-  <form action="/<span><%= username %></span>/results" method="post" id="quizmakerform">
+  <form action="/<%= username %>/results" method="post" id="quizmakerform">
     <div class="masonry-layout">
 
       <div class="masonry-layout-panel">
@@ -25,7 +25,7 @@
 
       <div class="masonry-layout-panel">
         <div class="masonry-layout-content">
-          <label for="crush"><span><%= username %></span>'s current crush (First Name)</label>
+          <label for="crush"><span><%= username %></span>'s current crush 😍(First Name)</label>
           <input type="text" name="crush" /><br>
         </div>
       </div>
@@ -53,14 +53,14 @@
 
       <div class="masonry-layout-panel">
         <div class="masonry-layout-content">
-          <label for="enemy">Who is <span><%= username %></span>'s enemy (First Name)</label>
+          <label for="enemy">Who is <span><%= username %></span>'s enemy 😡(First Name)</label>
           <input type="text" name="enemy" /><br>
         </div>
       </div>
 
       <div class="masonry-layout-panel">
         <div class="masonry-layout-content">
-          <label for="song">What is <span><%= username %></span>'s favorite song? (Don't include artist)</label>
+          <label for="song">What is <span><%= username %></span>'s favorite song? 💽(Don't include artist)</label>
           <input type="text" name="favsong" /><br>
         </div>
       </div>
@@ -68,13 +68,14 @@
       <div class="masonry-layout-panel">
         <div class="masonry-layout-content">
           <label for="song">What song would make <span><%= username %></span> cry? (Don't include artist)</label>
-          <input type="text" name="sadsong" /><br>
+          <input type="text" name="sadsong"/><br>
         </div>
       </div>
     </div>
     <div class="masonry-layout-content masonry-inverse-margin">
-      <textarea name="message" form="quizmakerform">Enter message here to send to <%= username %></textarea><br>
-      <input type="submit" name="Check your score!" />
+      <label for="message">Enter your name!</label>
+      <input type="text" name="message"/><br>
+      <input type="submit" name="Check your score!"/>
     </div>
   </form>
 
